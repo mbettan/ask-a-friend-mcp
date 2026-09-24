@@ -1,11 +1,10 @@
 <p align="center">
-  <img src="https://em-content.zobj.net/source/apple/391/speech-balloon_1f4ac.png" width="120" alt="Ask-a-Friend MCP" />
+  <img src="docs/assets/og-image.jpg" alt="Ask-a-Friend — Even your AI needs a second opinion" width="720" />
 </p>
 
-<h1 align="center">Ask-a-Friend MCP</h1>
-
 <p align="center">
-  <strong>why get stuck when a specialized frontier friend can help — over MCP?</strong>
+  <strong>Your coding agent is confident. Confidently wrong, sometimes.</strong><br>
+  Give it a way to phone a friend.
 </p>
 
 <p align="center">
@@ -17,50 +16,86 @@
 </p>
 
 <p align="center">
-  <a href="#before--after">before/after</a> •
+  <a href="https://mbettan.github.io/ask-a-friend-mcp/">live demo</a> •
+  <a href="#whats-an-mcp">what's an MCP?</a> •
+  <a href="#why-bother">why bother</a> •
   <a href="#deploy">deploy</a> •
   <a href="#connect-clients">connect clients</a> •
   <a href="#what-you-get">what you get</a> •
-  <a href="#how-it-works">how it works</a> •
-  <a href="#vertex-ai-org-policies">org policies</a>
+  <a href="#how-it-works">how it works</a>
 </p>
 
 ---
 
-A cloud-hosted **Model Context Protocol (MCP)** server on **Google Cloud Run** that lets any AI agent (**Claude Web & Desktop**, **Claude Code CLI**, **ChatGPT**, **Cursor IDE**, **Gemini / Antigravity CLI**) phone a specialized frontier model on **Google Vertex AI (`global`)** — powered by **Anthropic Claude Opus 5.5 (`opus-5-5`, 128K output, Adaptive High Thinking, Real-Time Web Search, 1M Context)** and **Google Gemini 3.8 Flash (`HIGH` Thinking + Google Search Grounding)** — with built-in PII scrubbing, prompt injection defense, and SHA-256 + ephemeral caching.
+Ask-a-Friend is an open-source **MCP server** you host on your own Google Cloud project. It gives
+your AI agent one extra tool: `ask_a_friend`.
+
+When your agent calls it, the question goes to a **completely different frontier model** — one that
+hasn't seen the conversation, doesn't share the first model's assumptions, and has no reason to
+agree with it. The friend reviews the work, says what it actually thinks, and the answer comes back
+inline. One tool call.
+
+Works with **Claude Web & Desktop**, **Claude Code CLI**, **ChatGPT**, **Cursor IDE**, and
+**Gemini / Antigravity CLI**. Friends are **Claude Opus 5.5** and **Gemini 3.8 Flash**, running on
+**Vertex AI (`global`)**, with PII scrubbed before anything leaves your server.
 
 ---
 
-## Before / after
+## What's an MCP?
+
+Skip this if you already know.
+
+Your AI agent is smart but sealed in a box. It can write about your database, but it can't query it.
+It can describe an API call, but it can't make one. Every capability beyond "generate text" has to be
+handed to it from outside.
+
+**Model Context Protocol** is the standard for handing things over. Think of it like a USB port. Before
+USB, every device needed its own proprietary connector. Now there's one shape, and anything that fits
+just works — no driver hunting, no per-app integration.
+
+MCP is the same idea for AI tools. Write a server once, and Claude, ChatGPT, Cursor, and Gemini can
+all use it. No custom glue for each one.
+
+> **MCP is just the plug shape. Ask-a-Friend is what you plug in.**
+
+---
+
+## Why bother
+
+Your agent is one model. One training run, one set of habits, one set of blind spots. When it
+misses something, asking it again doesn't help — you get the same blind spot back, phrased
+differently. That's not review. That's an echo chamber.
 
 <table>
 <tr>
 <td width="50%">
 
-### 🗣️ Raw single-agent loop (vulnerable & tunnel-visioned)
+### 🗣️ One model, on its own
 
-> Agent retries the same bug in a single-model echo chamber or sends raw credentials and unredacted code straight to external APIs:
+> The agent retries the same bug against its own assumptions, and ships raw credentials and
+> unredacted code straight to external APIs:
 > * 🔓 Raw secrets (`sk-ant-...`, `AKIA...`, emails) sent in plain text
 > * 🧠 Single-model blind spots on subtle concurrency, security, or tax/math edge cases
-> * 📅 Stale training cutoffs without live CVE or SDK doc verification
-> * 💸 Identical prompts re-sent over the wire during iterative debugging
+> * 📅 Stale training cutoffs, with no live CVE or SDK doc verification
+> * 💸 Identical prompts re-sent over the wire on every debug iteration
 
 </td>
 <td width="50%">
 
-### 🔒 Secure `ask-a-friend` MCP call (sanitized, live-grounded, & cached)
+### 🤝 One `ask_a_friend` call
 
-> A dedicated FastMCP proxy scrubs sensitive identifiers pre-transit, grounds answers with live web search, and caches deterministically:
-> * 🛡️ **Pre-transit PII scrubbing** replaces secrets with placeholders (`__PII_REDACTED_1__`) and rehydrates locally
-> * 🔬 **Adaptive High Thinking + Live Web Search** (`opus-5-5` & `gemini-3.8-flash`)
-> * ⚡ **Dual-layer caching** (`~1ms` SHA-256 local cache + `~90%` cheaper Vertex AI Ephemeral Prompt Cache)
-> * 🔄 **Resilient multi-provider failover** across Anthropic and Google GenAI
+> A FastMCP proxy scrubs sensitive identifiers before transit, grounds the answer in live web
+> search, and caches deterministically:
+> * 🛡️ **Pre-transit PII scrubbing** swaps secrets for placeholders (`__PII_REDACTED_1__`) and rehydrates locally
+> * 🔬 **Adaptive High Thinking + live web search** (`opus-5-5` & `gemini-3.8-flash`)
+> * ⚡ **Dual-layer caching** (`~1ms` SHA-256 local cache + `~90%` cheaper Vertex AI ephemeral prompt cache)
+> * 🔄 **Multi-provider failover** across Anthropic and Google GenAI
 
 </td>
 </tr>
 </table>
 
-**Cross-model peer review. Live web grounding. Zero credential leakage.**
+**A different model. Grounded in today's web. Your secrets never leave the building.**
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -76,9 +111,7 @@ A cloud-hosted **Model Context Protocol (MCP)** server on **Google Cloud Run** t
 
 ## Deploy
 
-### 1-Command Google Cloud Run Deployment
-
-Deploy your own private, serverless MCP instance on Google Cloud Run in one command:
+It's your server, your Google Cloud project, your bill. Nothing routes through anyone else.
 
 ```bash
 chmod +x deploy.sh
@@ -92,14 +125,21 @@ chmod +x deploy.sh
 4. Generates and stores your `MCP_API_KEY` (`aaf_...`) in Google Cloud Secret Manager (`mcp-api-key`).
 5. Builds and deploys the pure MCP server container (`docs/` excluded via `.gcloudignore` / `.dockerignore`) to Cloud Run.
 
-Retrieve your generated `MCP_API_KEY` anytime:
+Grab your generated `MCP_API_KEY` anytime:
+
 ```bash
 gcloud secrets versions access latest --secret=mcp-api-key --project=<YOUR_GCP_PROJECT_ID>
 ```
 
+> [!IMPORTANT]
+> `MCP_API_KEY` is **required** in `api_key` and `oauth2` auth modes — the server refuses to boot
+> without it rather than starting up unauthenticated. See [`.env.example`](.env.example).
+
 ---
 
 ## Connect clients
+
+Swap `your-cloud-run-url.run.app` for the URL `deploy.sh` prints at the end.
 
 ### 1. Claude Custom Connector (Claude Web & Claude Desktop UI)
 1. Open **Settings &rarr; Connectors &rarr; Add custom connector**.
@@ -148,7 +188,7 @@ Verify inside Claude Code with `claude mcp list` or `/mcp`.
 
 ## Use
 
-Once connected, your agent can consult a friend through natural language or explicit MCP tool invocations:
+Once connected, just ask. Your agent picks the tool up on its own, or you can name it explicitly:
 
 ```text
 "Ask a friend (opus-5-5) to audit this JWT verification middleware for timing leaks and recent CVEs."
@@ -160,7 +200,7 @@ Once connected, your agent can consult a friend through natural language or expl
 
 ## What you get
 
-### Default Model Capabilities (Enabled Out-of-the-Box)
+### The friends (enabled out-of-the-box)
 
 | Model Alias | Vertex AI Target (`global`) | Enabled Default Features | Max Output |
 |---|---|---|---|
@@ -169,7 +209,7 @@ Once connected, your agent can consult a friend through natural language or expl
 | `gemini-3.8-flash` / `gemini-pro` | `gemini-3.8-flash` | **`HIGH` Thinking (`thinking_level="HIGH"`)**, **Google Search Grounding (`googleSearch`)**, **URL Context (`urlContext`)**, automatic provider failover | `65,536` tokens |
 | `gemini-3.5-flash-lite` | `gemini-3.5-flash-lite` | Ultra-low-latency analytical inference & lightweight verification | `65,536` tokens |
 
-### Architecture & Pipeline Components
+### What's inside
 
 | Component | Module | Description |
 |---|---|---|
@@ -203,11 +243,11 @@ sequenceDiagram
     Scrubber-->>Client: Clean, exact, sanitized peer review response
 ```
 
-1. **Authenticated MCP/REST Request:** Your agent calls `ask_a_friend` over Streamable HTTP (`/mcp`), SSE (`/sse`), or OpenAPI REST (`/api/v1/ask`).
-2. **Inbound Security & PII Scrubbing:** [`SecurityInterceptor`](src/interceptor.py) blocks prompt-override attacks while [`scrub_pii`](scripts/pii.py) replaces sensitive keys and emails with safe tokens (`__PII_REDACTED_1__`).
-3. **Cache & Intelligent Routing:** [`ask_a_friend`](scripts/ask_friend.py) checks the SHA-256 cache first; on a miss, it routes to `opus-5-5` (with automatic failover to `gemini-3.8-flash`).
-4. **Live-Grounded Vertex AI Inference:** `claude-opus-5-5` executes with **Adaptive Thinking (`effort="high"`)**, **Ephemeral Prompt Caching**, **1M Context**, and **Server-Side Web Search (`web_search_20250305`)**.
-5. **Local Rehydration:** Placeholders are restored to your original variable/identifier names before returning the response to your agent.
+1. **Check who's asking.** Your agent calls `ask_a_friend` over Streamable HTTP (`/mcp`), SSE (`/sse`), or OpenAPI REST (`/api/v1/ask`). [`SecurityInterceptor`](src/interceptor.py) blocks prompt-override attacks on the way in.
+2. **Scrub your secrets.** [`scrub_pii`](scripts/pii.py) replaces sensitive keys and emails with safe tokens (`__PII_REDACTED_1__`) *before* anything leaves your server.
+3. **Check if we've asked this before.** [`ask_a_friend`](scripts/ask_friend.py) hits the SHA-256 cache first; on a miss, it routes to `opus-5-5` (with automatic failover to `gemini-3.8-flash`).
+4. **The friend thinks it over.** `claude-opus-5-5` runs with **Adaptive Thinking (`effort="high"`)**, **Ephemeral Prompt Caching**, **1M Context**, and **server-side web search (`web_search_20250305`)**.
+5. **Put your secrets back.** Placeholders are restored to your original variable and identifier names locally, then the answer goes back to your agent.
 
 ---
 
