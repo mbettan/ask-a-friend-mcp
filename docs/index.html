@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Ask-a-Friend MCP — Cloud-Hosted AI Peer Review via Claude Opus 5.5 &amp; Gemini</title>
-  
+
   <!-- SEO & Search Optimization Metadata -->
   <meta name="title" content="Ask-a-Friend MCP — Cloud-Hosted AI Peer Review via Claude Opus 5.5 &amp; Gemini 3.8 Flash">
   <meta name="description" content="Cloud-hosted FastMCP server on Google Cloud Run. Delegate code review, security audits, and second opinions from Claude Web/Desktop/Code, ChatGPT, Cursor IDE, and Gemini CLI to Claude Opus 5.5 (opus-5-5, 128K output, Adaptive High Thinking, Real-Time Web Search, 1M Context) and Gemini 3.8 Flash (High Thinking) on Vertex AI (global).">
@@ -23,7 +23,7 @@
 
   <!-- Mobile & Browser Theming -->
   <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#0a0c10">
+  <meta name="theme-color" content="#0b0a10">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ask-a-Friend MCP">
@@ -82,6 +82,35 @@
           "@type": "Organization",
           "name": "Ask-a-Friend MCP Contributors"
         }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is MCP (Model Context Protocol)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "MCP is an open standard that lets AI assistants call external tools. Think of it as a USB port for AI: you plug a capability in once, and any MCP-compatible client — Claude, ChatGPT, Cursor, Gemini CLI — can use it without custom integration code."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why would an AI agent need to ask another AI model?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A single model has consistent blind spots. It reviews its own code with the same assumptions it used to write it. A different model family brings different training and catches different bugs, which is why human teams use code review."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is my code sent to a third party?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You self-host Ask-a-Friend on your own Google Cloud project. Requests go to Vertex AI under your own credentials. Before anything leaves your machine, the PII scrubber redacts API keys, tokens, private keys, emails, and home directory paths, then rehydrates them in the response."
+            }
+          }
+        ]
       }
     ]
   }
@@ -91,303 +120,508 @@
 </head>
 <body>
 
-  <!-- Background Ambient Glow -->
-  <div class="bg-glow-container" aria-hidden="true">
-    <div class="glow-orb glow-1"></div>
-    <div class="glow-orb glow-2"></div>
-    <div class="glow-orb glow-3"></div>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Ambient background -->
+  <div class="bg-field" aria-hidden="true">
+    <div class="orb orb-you"></div>
+    <div class="orb orb-friend"></div>
+    <div class="orb orb-violet"></div>
+    <div class="bg-grid"></div>
   </div>
 
-  <!-- Navigation Bar -->
+  <!-- Navigation -->
   <nav class="navbar">
-    <a href="#" class="nav-brand">
-      <span class="brand-icon">🤝</span>
-      <span>Ask-a-Friend MCP</span>
+    <a href="#" class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <span class="brand-dot brand-dot-you"></span>
+        <span class="brand-dot brand-dot-friend"></span>
+      </span>
+      <span class="brand-text">Ask&#8209;a&#8209;Friend</span>
     </a>
-    <div class="nav-links">
-      <a href="#features" class="nav-link">Features</a>
-      <a href="#playground" class="nav-link">Playground</a>
-      <a href="#clients" class="nav-link">Client Setup</a>
-      <a href="openapi.yaml" class="nav-link">OpenAPI</a>
-      <a href="llms.txt" class="nav-link">llms.txt</a>
-      <a href="https://github.com/mbettan/ask-a-friend-mcp" class="btn-secondary" target="_blank" rel="noopener">GitHub</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </button>
+    <div class="nav-links" id="nav-links">
+      <a href="#what-is-mcp" class="nav-link">What's an MCP?</a>
+      <a href="#why" class="nav-link">Why bother</a>
+      <a href="#demo" class="nav-link">Live demo</a>
+      <a href="#friends" class="nav-link">The friends</a>
+      <a href="#setup" class="nav-link">Setup</a>
+      <a href="https://github.com/mbettan/ask-a-friend-mcp" class="btn btn-ghost btn-sm" target="_blank" rel="noopener">GitHub&nbsp;↗</a>
     </div>
   </nav>
 
-  <main class="container">
-    <!-- Hero Section -->
+  <main id="main">
+
+    <!-- ══ HERO ══ -->
     <header class="hero">
-      <div class="hero-pill">
-        <span>⚡ Cloud-Hosted on Google Cloud Run &amp; Vertex AI (Global)</span>
-      </div>
-      <h1 class="hero-title">Cloud AI Peer Review<br>For Any Agent</h1>
-      <p class="hero-subtitle">
-        Stuck on a tricky bug or pre-merge security review? Phone a friend. Connect <strong>Claude Web &amp; Code</strong>, <strong>ChatGPT</strong>, <strong>Cursor IDE</strong>, and <strong>Gemini CLI</strong> to <strong>Claude Opus 5.5 (<code>opus-5-5</code>, Adaptive High Thinking + Live Web Search + 128K Output)</strong> and <strong>Gemini 3.8 Flash (<code>HIGH</code> Thinking)</strong> via a high-concurrency FastMCP server.
-      </p>
-      <div class="hero-cta-group">
-        <a href="#playground" class="btn-primary">Try Interactive Demo &rarr;</a>
-        <a href="#clients" class="btn-secondary">1-Click Client Setup</a>
+      <div class="shell hero-grid">
+
+        <div class="hero-copy">
+          <p class="eyebrow">
+            <span class="eyebrow-dot" aria-hidden="true"></span>
+            Open source &middot; Self-hosted on your own Google Cloud
+          </p>
+
+          <h1 class="hero-title">
+            Even your AI needs<br>
+            <span class="grad-text">a second opinion.</span>
+          </h1>
+
+          <p class="hero-sub">
+            Your coding agent is confident. Confidently wrong, sometimes. Ask&#8209;a&#8209;Friend lets it
+            <strong>phone a friend</strong> — a completely different model that reviews the work,
+            finds what the first one missed, and reports back. All in one tool call.
+          </p>
+
+          <div class="hero-cta">
+            <a href="#demo" class="btn btn-primary">
+              <span aria-hidden="true">▶</span> Watch it work
+            </a>
+            <a href="#what-is-mcp" class="btn btn-ghost">New to MCP? Start here</a>
+          </div>
+
+          <dl class="hero-stats">
+            <div class="stat">
+              <dt>Setup time</dt>
+              <dd>~2 min</dd>
+            </div>
+            <div class="stat">
+              <dt>Clients supported</dt>
+              <dd>5+</dd>
+            </div>
+            <div class="stat">
+              <dt>Your code leaves scrubbed</dt>
+              <dd>Always</dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- Animated conversation -->
+        <div class="hero-demo" aria-label="Illustration of one AI agent asking another for a second opinion">
+          <div class="chat" id="hero-chat">
+            <div class="chat-row chat-you">
+              <span class="avatar avatar-you" aria-hidden="true">🤖</span>
+              <div class="bubble bubble-you">
+                <span class="bubble-who">Your agent</span>
+                Shipping this auth middleware. Looks good to me!
+                <pre class="bubble-code"><code>if (token === process.env.API_SECRET)</code></pre>
+              </div>
+            </div>
+
+            <div class="chat-row chat-tool">
+              <div class="tool-chip">
+                <span class="tool-spark" aria-hidden="true"></span>
+                calling <code>ask_a_friend</code>…
+              </div>
+            </div>
+
+            <div class="chat-row chat-friend">
+              <span class="avatar avatar-friend" aria-hidden="true">🧠</span>
+              <div class="bubble bubble-friend">
+                <span class="bubble-who">The friend <em>(different model)</em></span>
+                Hold on. That's a <strong>timing attack</strong> — <code>===</code> short-circuits on
+                the first wrong byte. An attacker can guess your secret one character at a time.
+                <div class="verdict">
+                  <span class="verdict-dot" aria-hidden="true"></span>
+                  Use <code>crypto.timingSafeEqual()</code>
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-row chat-you">
+              <span class="avatar avatar-you" aria-hidden="true">🤖</span>
+              <div class="bubble bubble-you bubble-final">
+                …good catch. Fixing that now.
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </header>
 
-    <!-- Features & Architecture Grid -->
-    <section id="features" class="section">
-      <div class="section-header">
-        <div class="section-tag">Enterprise Architecture</div>
-        <h2 class="section-title">Engineered for High-Assurance Peer Review</h2>
-      </div>
+    <!-- ══ WHAT IS MCP ══ -->
+    <section id="what-is-mcp" class="section">
+      <div class="shell">
+        <div class="section-head reveal">
+          <p class="tag">First things first</p>
+          <h2 class="section-title">Hold on — what's an <span class="grad-text">MCP</span>?</h2>
+          <p class="section-sub">
+            No jargon. Here's the whole idea in about thirty seconds.
+          </p>
+        </div>
 
-      <div class="grid-3">
-        <article class="card">
-          <div class="card-icon">🧠</div>
-          <h3 class="card-title">Claude Opus 5.5 &amp; Sonnet 5 (128K Out)</h3>
-          <p class="card-desc">Routes deep code reasoning, security audits, and architecture critiques to Anthropic Claude Opus 5.5 (<code>opus-5-5</code>) on Vertex AI (<code>global</code>) with <strong>Adaptive High Thinking</strong>, <strong>1M Token Context</strong>, and <strong>Ephemeral Prompt Caching</strong> enabled by default.</p>
-        </article>
+        <div class="analogy reveal">
+          <div class="analogy-icon" aria-hidden="true">🔌</div>
+          <div class="analogy-body">
+            <h3>It's a USB port for AI.</h3>
+            <p>
+              Before USB, every device needed its own weird connector. MCP — the
+              <strong>Model Context Protocol</strong> — does for AI what USB did for hardware.
+              You build a capability <em>once</em>, and every MCP-compatible app can plug into it:
+              Claude, ChatGPT, Cursor, Gemini CLI, and whatever ships next month.
+            </p>
+          </div>
+        </div>
 
-        <article class="card">
-          <div class="card-icon">🌐</div>
-          <h3 class="card-title">Real-Time Web Search &amp; Grounding</h3>
-          <p class="card-desc">Enabled by default with server-side <code>web_search_20250305</code> on Claude and <code>googleSearch</code> + <code>urlContext</code> on <strong>Gemini 3.8 Flash (High Thinking)</strong> to verify live CVEs, SDK releases, and docs.</p>
-        </article>
+        <ol class="steps cq-grid">
+          <li class="step-card reveal">
+            <span class="step-num">1</span>
+            <h3>You ask your agent something</h3>
+            <p>
+              "Review this before I merge it." Normal request, in whatever app you already use.
+            </p>
+          </li>
+          <li class="step-card reveal">
+            <span class="step-num">2</span>
+            <h3>It notices it has a tool for that</h3>
+            <p>
+              Your agent sees an <code>ask_a_friend</code> tool is available and decides to call it —
+              no prompting gymnastics required.
+            </p>
+          </li>
+          <li class="step-card reveal">
+            <span class="step-num">3</span>
+            <h3>The tool does real work</h3>
+            <p>
+              Our server scrubs your secrets, routes to a different model, and streams the
+              answer back into your chat. You never leave the app.
+            </p>
+          </li>
+        </ol>
 
-        <article class="card">
-          <div class="card-icon">🛡️</div>
-          <h3 class="card-title">Security &amp; PII Interceptor</h3>
-          <p class="card-desc">Automatic pre-transit PII scrubbing &amp; rehydration, inbound prompt injection neutralization, and outbound secret taint tracking to prevent credential leaks.</p>
-        </article>
-
-        <article class="card">
-          <div class="card-icon">🔌</div>
-          <h3 class="card-title">Dual-Transport FastMCP &amp; OAuth 2.0</h3>
-          <p class="card-desc">Streamable HTTP on <code>/mcp</code> and SSE on <code>/sse</code> with RFC 7591 OAuth 2.0 Dynamic Client Registration for 1-click connection in Claude Custom Connectors and ChatGPT.</p>
-        </article>
-
-        <article class="card">
-          <div class="card-icon">⚡</div>
-          <h3 class="card-title">Gemini 3.8 Flash High Thinking Failover</h3>
-          <p class="card-desc">Resilient multi-provider fallback ladder automatically fails over to Google Gemini 3.8 Flash (<code>thinking_level="HIGH"</code>, 65K output tokens) on regional quota pressure.</p>
-        </article>
-
-        <article class="card">
-          <div class="card-icon">🗄️</div>
-          <h3 class="card-title">SHA-256 &amp; Ephemeral Caching</h3>
-          <p class="card-desc">Combines deterministic in-memory SHA-256 response caching with Vertex AI ephemeral prompt caching to cut latency by ~80% and cached input token costs by ~90%.</p>
-        </article>
+        <p class="footnote reveal">
+          That's it. MCP is just the plug shape. <strong>Ask-a-Friend is what you plug in.</strong>
+        </p>
       </div>
     </section>
 
-    <!-- Interactive Simulation Playground -->
-    <section id="playground" class="section">
-      <div class="section-header">
-        <div class="section-tag">Interactive Simulation</div>
-        <h2 class="section-title">Experience the Full MCP Pipeline</h2>
-        <p class="section-subtitle">Watch your request travel through auth, PII scrubbing, caching, model routing, and Vertex AI inference — step by step.</p>
-      </div>
-
-      <div class="playground-box">
-        <div class="playground-header">
-          <div class="terminal-dots">
-            <span class="dot dot-red"></span>
-            <span class="dot dot-yellow"></span>
-            <span class="dot dot-green"></span>
-          </div>
-          <span class="playground-title">ask-a-friend-mcp &mdash; pipeline simulator</span>
-          <span id="resolved-model-badge" class="model-badge">opus-5-5</span>
+    <!-- ══ WHY ══ -->
+    <section id="why" class="section section-alt">
+      <div class="shell">
+        <div class="section-head reveal">
+          <p class="tag">The actual problem</p>
+          <h2 class="section-title">One model means <span class="grad-text">one blind spot.</span></h2>
+          <p class="section-sub">
+            Asking a model to check its own work is like proofreading your own essay at 2am.
+            It re-reads what it <em>meant</em> to write.
+          </p>
         </div>
 
-        <!-- 3-Zone Layout: Input | Pipeline | Output -->
-        <div class="playground-layout">
+        <div class="compare">
+          <article class="compare-card compare-bad reveal">
+            <header>
+              <span class="compare-badge" aria-hidden="true">😐</span>
+              <h3>Reviewing itself</h3>
+            </header>
+            <ul>
+              <li>Same training data, same habits</li>
+              <li>Repeats the assumption that caused the bug</li>
+              <li>Agrees with itself — confidently</li>
+              <li>You get a rubber stamp, not a review</li>
+            </ul>
+          </article>
 
-          <!-- Zone 1: Input Panel -->
-          <div class="pg-zone pg-input">
-            <div class="zone-header">
-              <span class="zone-icon">📥</span>
-              <span class="zone-label">MCP Tool Call</span>
+          <div class="compare-vs" aria-hidden="true"><span>vs</span></div>
+
+          <article class="compare-card compare-good reveal">
+            <header>
+              <span class="compare-badge" aria-hidden="true">🤝</span>
+              <h3>Phoning a friend</h3>
+            </header>
+            <ul>
+              <li>Different model family, different instincts</li>
+              <li>Arrives with zero context to defend</li>
+              <li>Disagrees when you're wrong</li>
+              <li>You get an actual second pair of eyes</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="why-notes cq-grid">
+          <div class="note reveal">
+            <span class="note-icon" aria-hidden="true">🛡️</span>
+            <h4>Your secrets never leave</h4>
+            <p>
+              API keys, tokens, private keys, emails, and <code>/Users/you/…</code> paths are
+              redacted <em>before</em> the request goes out, then restored in the reply.
+            </p>
+          </div>
+          <div class="note reveal">
+            <span class="note-icon" aria-hidden="true">🏠</span>
+            <h4>It's your cloud</h4>
+            <p>
+              You deploy it to your own Google Cloud project. There's no middleman service,
+              no shared instance, and no one else's logs.
+            </p>
+          </div>
+          <div class="note reveal">
+            <span class="note-icon" aria-hidden="true">💸</span>
+            <h4>It doesn't ask twice</h4>
+            <p>
+              Identical questions hit a SHA-256 cache instead of the model, so repeat
+              reviews are instant and free.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ DEMO ══ -->
+    <section id="demo" class="section">
+      <div class="shell">
+        <div class="section-head reveal">
+          <p class="tag">Live demo</p>
+          <h2 class="section-title">Watch a question <span class="grad-text">make the round trip.</span></h2>
+          <p class="section-sub">
+            This is a faithful simulation of the real pipeline — same stages, same order.
+            It starts on its own; pick a different question any time.
+          </p>
+        </div>
+
+        <div class="demo-wrap reveal">
+
+          <div class="demo-toolbar">
+            <div class="demo-chrome" aria-hidden="true">
+              <span></span><span></span><span></span>
             </div>
-
-            <label for="task-select" class="form-label">task_type</label>
-            <select id="task-select" class="form-select">
-              <option value="code_review">code_review</option>
-              <option value="security_audit">security_audit</option>
-              <option value="build_tests">build_tests</option>
-              <option value="second_opinion">second_opinion</option>
-              <option value="spec_critique">spec_critique</option>
-            </select>
-
-            <label for="prompt-input" class="form-label">prompt</label>
-            <textarea id="prompt-input" class="form-textarea" rows="2" placeholder="Scoped question..."></textarea>
-
-            <label for="context-input" class="form-label">context</label>
-            <textarea id="context-input" class="form-textarea pg-context" rows="4" placeholder="Code snippet..."></textarea>
-
-            <button id="run-sim-btn" class="btn-primary pg-run-btn">
-              <span class="run-icon">▶</span>
-              <span id="run-btn-label">Execute Pipeline</span>
+            <label class="demo-picker">
+              <span class="sr-only">Choose a question</span>
+              <select id="task-select">
+                <option value="code_review">🔍 Review my code</option>
+                <option value="security_audit">🛡️ Audit for vulnerabilities</option>
+                <option value="build_tests">🧪 Write me tests</option>
+                <option value="second_opinion">💭 Give a second opinion</option>
+                <option value="spec_critique">📐 Poke holes in my design</option>
+              </select>
+            </label>
+            <span class="model-chip" id="resolved-model-badge">opus-5-5</span>
+            <button id="run-sim-btn" class="btn btn-primary btn-sm">
+              <span id="run-btn-label">Run it again</span>
             </button>
           </div>
 
-          <!-- Zone 2: Pipeline Visualization -->
-          <div class="pg-zone pg-pipeline">
-            <div class="zone-header">
-              <span class="zone-icon">⚙️</span>
-              <span class="zone-label">Pipeline Stages</span>
+          <div class="demo-body">
+
+            <!-- Input -->
+            <div class="demo-pane demo-input">
+              <p class="pane-label">You send</p>
+              <label class="sr-only" for="prompt-input">Prompt</label>
+              <textarea id="prompt-input" class="field" rows="2" placeholder="Scoped question…"></textarea>
+              <label class="sr-only" for="context-input">Code context</label>
+              <textarea id="context-input" class="field field-mono" rows="7" placeholder="Code snippet…"></textarea>
             </div>
 
-            <div class="pipeline-steps">
-              <div class="pipeline-step" data-step="auth">
-                <div class="step-indicator"><span class="step-dot"></span></div>
-                <div class="step-content">
-                  <div class="step-name">🔐 Auth Middleware</div>
-                  <div class="step-detail">Verifying Bearer token…</div>
-                </div>
-                <div class="step-timer"></div>
-              </div>
-              <div class="pipeline-connector"></div>
-
-              <div class="pipeline-step" data-step="injection">
-                <div class="step-indicator"><span class="step-dot"></span></div>
-                <div class="step-content">
-                  <div class="step-name">🛡️ Injection Guard</div>
-                  <div class="step-detail">Scanning for prompt injection…</div>
-                </div>
-                <div class="step-timer"></div>
-              </div>
-              <div class="pipeline-connector"></div>
-
-              <div class="pipeline-step" data-step="pii">
-                <div class="step-indicator"><span class="step-dot"></span></div>
-                <div class="step-content">
-                  <div class="step-name">🧹 PII Scrubber</div>
-                  <div class="step-detail">Redacting secrets &amp; PII…</div>
-                </div>
-                <div class="step-timer"></div>
-              </div>
-              <div class="pipeline-connector"></div>
-
-              <div class="pipeline-step" data-step="cache">
-                <div class="step-indicator"><span class="step-dot"></span></div>
-                <div class="step-content">
-                  <div class="step-name">🗄️ Cache Lookup</div>
-                  <div class="step-detail">SHA-256 cache check…</div>
-                </div>
-                <div class="step-timer"></div>
-              </div>
-              <div class="pipeline-connector"></div>
-
-              <div class="pipeline-step" data-step="route">
-                <div class="step-indicator"><span class="step-dot"></span></div>
-                <div class="step-content">
-                  <div class="step-name">🔀 Auto-Router</div>
-                  <div class="step-detail">Resolving model…</div>
-                </div>
-                <div class="step-timer"></div>
-              </div>
-              <div class="pipeline-connector"></div>
-
-              <div class="pipeline-step step-inference" data-step="inference">
-                <div class="step-indicator"><span class="step-dot"></span></div>
-                <div class="step-content">
-                  <div class="step-name">☁️ Vertex AI Inference</div>
-                  <div class="step-detail">Calling model…</div>
-                </div>
-                <div class="step-timer"></div>
-              </div>
-              <div class="pipeline-connector"></div>
-
-              <div class="pipeline-step" data-step="rehydrate">
-                <div class="step-indicator"><span class="step-dot"></span></div>
-                <div class="step-content">
-                  <div class="step-name">🔄 PII Rehydrate</div>
-                  <div class="step-detail">Restoring redacted tokens…</div>
-                </div>
-                <div class="step-timer"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Zone 3: Output + Stats -->
-          <div class="pg-zone pg-output">
-            <div class="zone-header">
-              <span class="zone-icon">📤</span>
-              <span class="zone-label">Friend's Response</span>
+            <!-- Pipeline -->
+            <div class="demo-pane demo-pipeline">
+              <p class="pane-label">What happens</p>
+              <ol class="pipe" id="pipe">
+                <li class="pipe-step" data-step="auth">
+                  <span class="pipe-ico" aria-hidden="true">🔑</span>
+                  <span class="pipe-text"><b>Check who's asking</b><span class="step-detail">Verifying token…</span></span>
+                  <span class="step-timer"></span>
+                </li>
+                <li class="pipe-step" data-step="injection">
+                  <span class="pipe-ico" aria-hidden="true">🧯</span>
+                  <span class="pipe-text"><b>Block prompt injection</b><span class="step-detail">Scanning…</span></span>
+                  <span class="step-timer"></span>
+                </li>
+                <li class="pipe-step" data-step="pii">
+                  <span class="pipe-ico" aria-hidden="true">🕶️</span>
+                  <span class="pipe-text"><b>Scrub your secrets</b><span class="step-detail">Redacting…</span></span>
+                  <span class="step-timer"></span>
+                </li>
+                <li class="pipe-step" data-step="cache">
+                  <span class="pipe-ico" aria-hidden="true">🗄️</span>
+                  <span class="pipe-text"><b>Asked this before?</b><span class="step-detail">Cache check…</span></span>
+                  <span class="step-timer"></span>
+                </li>
+                <li class="pipe-step" data-step="route">
+                  <span class="pipe-ico" aria-hidden="true">🧭</span>
+                  <span class="pipe-text"><b>Pick the right friend</b><span class="step-detail">Resolving…</span></span>
+                  <span class="step-timer"></span>
+                </li>
+                <li class="pipe-step" data-step="inference">
+                  <span class="pipe-ico" aria-hidden="true">🧠</span>
+                  <span class="pipe-text"><b>Friend thinks it over</b><span class="step-detail">Calling model…</span></span>
+                  <span class="step-timer"></span>
+                </li>
+                <li class="pipe-step" data-step="rehydrate">
+                  <span class="pipe-ico" aria-hidden="true">🔄</span>
+                  <span class="pipe-text"><b>Put your secrets back</b><span class="step-detail">Restoring…</span></span>
+                  <span class="step-timer"></span>
+                </li>
+              </ol>
             </div>
 
-            <div id="output-window" class="output-window">Select a task type and click "Execute Pipeline" to simulate a full MCP round-trip.</div>
-
-            <!-- Stats Bar -->
-            <div id="stats-bar" class="stats-bar">
-              <div class="stat-item">
-                <span class="stat-label">Latency</span>
-                <span id="stat-latency" class="stat-value">—</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Model</span>
-                <span id="stat-model" class="stat-value">—</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Tokens</span>
-                <span id="stat-tokens" class="stat-value">—</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Cache</span>
-                <span id="stat-cache" class="stat-value">—</span>
+            <!-- Output -->
+            <div class="demo-pane demo-output">
+              <p class="pane-label">The friend says</p>
+              <div id="output-window" class="output">Starting…</div>
+              <div id="stats-bar" class="stats">
+                <div><span class="k">Took</span><span class="v" id="stat-latency">—</span></div>
+                <div><span class="k">Friend</span><span class="v" id="stat-model">—</span></div>
+                <div><span class="k">Tokens</span><span class="v" id="stat-tokens">—</span></div>
+                <div><span class="k">Cache</span><span class="v" id="stat-cache">—</span></div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 1-Click Client Configurations -->
-    <section id="clients" class="section">
-      <div class="section-header">
-        <div class="section-tag">Universal Compatibility</div>
-        <h2 class="section-title">1-Click Client Setup</h2>
-      </div>
+    <!-- ══ FRIENDS ══ -->
+    <section id="friends" class="section section-alt">
+      <div class="shell">
+        <div class="section-head reveal">
+          <p class="tag">The roster</p>
+          <h2 class="section-title">Meet the <span class="grad-text">friends.</span></h2>
+          <p class="section-sub">
+            Ask for one by name, or let it route automatically based on what you're asking.
+          </p>
+        </div>
 
-      <div class="tabs-header">
-        <button class="tab-btn active" data-client="claude_connector">Claude Connector &amp; Code CLI</button>
-        <button class="tab-btn" data-client="chatgpt_mcp">ChatGPT MCP Connector</button>
-        <button class="tab-btn" data-client="chatgpt_action">ChatGPT Custom GPT</button>
-        <button class="tab-btn" data-client="claude">Claude Desktop JSON</button>
-        <button class="tab-btn" data-client="cursor">Cursor IDE</button>
-        <button class="tab-btn" data-client="gemini">Gemini / Antigravity CLI</button>
-      </div>
+        <div class="friends cq-grid">
+          <article class="friend-card reveal">
+            <div class="friend-top">
+              <span class="friend-face" aria-hidden="true">🧠</span>
+              <div>
+                <h3>Claude Opus 5.5</h3>
+                <code>opus-5-5</code>
+              </div>
+            </div>
+            <p class="friend-role">The thorough one</p>
+            <p>
+              Deep reasoning for security audits and architecture critiques. Thinks hard,
+              searches the live web, and writes up to 128K tokens of findings.
+            </p>
+            <ul class="chips">
+              <li>Adaptive thinking</li><li>Web search</li><li>1M context</li>
+            </ul>
+          </article>
 
-      <div class="code-snippet-box">
-        <button class="copy-btn" data-target="config-code">Copy Config</button>
-        <pre><code id="config-code"># 1. Claude Custom Connector (Claude Web & Desktop UI)
-Settings -> Connectors -> Add custom connector:
-- Name: ask-a-friend
-- MCP server URL: https://your-cloud-run-url.run.app/mcp
-- Authentication: Sign in now (Detected)
-- OAuth client: Register automatically (Detected via RFC 7591)
-- Advanced -> Transport: Streamable HTTP
+          <article class="friend-card reveal">
+            <div class="friend-top">
+              <span class="friend-face" aria-hidden="true">⚡</span>
+              <div>
+                <h3>Claude Sonnet 5</h3>
+                <code>sonnet-5</code>
+              </div>
+            </div>
+            <p class="friend-role">The quick one</p>
+            <p>
+              Same family, faster turnaround. Good when you want a sanity check on
+              structure rather than a full forensic audit.
+            </p>
+            <ul class="chips">
+              <li>Fast reviews</li><li>Web search</li><li>1M context</li>
+            </ul>
+          </article>
 
-# 2. Claude Code CLI (claude)
-claude mcp add --scope user --transport http ask-a-friend \
-  https://your-cloud-run-url.run.app/mcp \
-  --header "X-MCP-API-Key: YOUR_MCP_API_KEY"</code></pre>
+          <article class="friend-card reveal">
+            <div class="friend-top">
+              <span class="friend-face" aria-hidden="true">💎</span>
+              <div>
+                <h3>Gemini 3.8 Flash</h3>
+                <code>gemini-3.8-flash</code>
+              </div>
+            </div>
+            <p class="friend-role">The other perspective</p>
+            <p>
+              An entirely different lineage, which is the whole point. Grounded in Google
+              Search, and the automatic fallback if Claude is busy.
+            </p>
+            <ul class="chips">
+              <li>HIGH thinking</li><li>Search grounding</li><li>Auto-failover</li>
+            </ul>
+          </article>
+        </div>
       </div>
     </section>
+
+    <!-- ══ SETUP ══ -->
+    <section id="setup" class="section">
+      <div class="shell">
+        <div class="section-head reveal">
+          <p class="tag">Two minutes</p>
+          <h2 class="section-title">Introduce your agent <span class="grad-text">to its new friend.</span></h2>
+          <p class="section-sub">
+            Deploy to your own Google Cloud project, then paste one config. Pick your app:
+          </p>
+        </div>
+
+        <div class="deploy reveal">
+          <span class="deploy-step">1</span>
+          <div>
+            <h3>Put it in your cloud</h3>
+            <pre class="code-block"><code>git clone https://github.com/mbettan/ask-a-friend-mcp.git
+cd ask-a-friend-mcp
+./deploy.sh &lt;YOUR_GCP_PROJECT_ID&gt;</code></pre>
+            <p class="deploy-note">
+              The script enables the APIs, generates your API key, and prints your server URL.
+            </p>
+          </div>
+        </div>
+
+        <div class="deploy reveal">
+          <span class="deploy-step">2</span>
+          <div>
+            <h3>Tell your agent about it</h3>
+
+            <div class="tabs" role="tablist" aria-label="Client configuration">
+              <button class="tab active" role="tab" aria-selected="true" data-client="claude_connector">Claude</button>
+              <button class="tab" role="tab" aria-selected="false" data-client="chatgpt_mcp">ChatGPT</button>
+              <button class="tab" role="tab" aria-selected="false" data-client="cursor">Cursor</button>
+              <button class="tab" role="tab" aria-selected="false" data-client="gemini">Gemini CLI</button>
+              <button class="tab" role="tab" aria-selected="false" data-client="claude">Claude Desktop</button>
+              <button class="tab" role="tab" aria-selected="false" data-client="chatgpt_action">Custom GPT</button>
+            </div>
+
+            <div class="code-wrap">
+              <button class="copy-btn" id="copy-config" type="button">Copy</button>
+              <pre class="code-block"><code id="config-code"></code></pre>
+            </div>
+            <p class="deploy-note">
+              Replace <code>your-cloud-run-url.run.app</code> with the URL the deploy script printed.
+            </p>
+          </div>
+        </div>
+
+        <div class="closer reveal">
+          <h3>That's the whole thing.</h3>
+          <p>Next time your agent is about to ship something questionable, it'll ask a friend first.</p>
+          <div class="closer-cta">
+            <a href="https://github.com/mbettan/ask-a-friend-mcp" class="btn btn-primary" target="_blank" rel="noopener">Get it on GitHub&nbsp;↗</a>
+            <a href="llms.txt" class="btn btn-ghost">Read llms.txt</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <!-- Footer -->
   <footer class="footer">
-    <div class="container footer-content">
-      <div>&copy; 2026 Ask-a-Friend MCP. Built on Google Cloud Run &amp; Vertex AI.</div>
-      <div class="footer-links">
-        <a href="llms.txt" class="footer-link">llms.txt</a>
-        <a href="llms-full.txt" class="footer-link">llms-full.txt</a>
-        <a href="openapi.yaml" class="footer-link">OpenAPI Spec</a>
-        <a href="robots.txt" class="footer-link">robots.txt</a>
-        <a href="sitemap.xml" class="footer-link">sitemap.xml</a>
+    <div class="shell footer-inner">
+      <div>
+        <p class="footer-brand">🤝 Ask-a-Friend MCP</p>
+        <p class="footer-tag">Because confident and correct aren't the same thing.</p>
       </div>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="https://github.com/mbettan/ask-a-friend-mcp">GitHub</a>
+        <a href="openapi.yaml">OpenAPI</a>
+        <a href="llms.txt">llms.txt</a>
+        <a href="llms-full.txt">llms-full.txt</a>
+        <a href="sitemap.xml">Sitemap</a>
+      </nav>
     </div>
+    <p class="footer-legal">Apache 2.0 · Self-hosted on Google Cloud Run &amp; Vertex AI</p>
   </footer>
 
-  <!-- Copy Toast Notification -->
-  <div id="toast" class="toast">Copied to clipboard!</div>
+  <div id="toast" class="toast" role="status" aria-live="polite">Copied!</div>
 
   <script src="app.js"></script>
 </body>
