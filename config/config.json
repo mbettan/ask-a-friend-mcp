@@ -1,0 +1,15 @@
+{
+  "project_id": "",
+  "location": "global",
+  "anthropic_region": "global",
+  "use_cases": {
+    "code_review": "opus-5-5",
+    "security_audit": "opus-5-5",
+    "spec_critique": "opus-5-5",
+    "build_tests": "opus-5-5",
+    "second_opinion": "opus-5-5"
+  },
+  "default_model": "opus-5-5",
+  "default_max_tokens": 128000,
+  "use_cache": true
+}

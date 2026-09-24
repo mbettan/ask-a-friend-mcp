@@ -1,0 +1,172 @@
+openapi: 3.1.0
+info:
+  title: Ask-a-Friend MCP API
+  description: Cloud-hosted AI peer review API. Allows AI agents (ChatGPT, Claude, Cursor, Gemini) to delegate scoped code reviews, security audits, and second opinions to Claude Opus 5.5 (opus-5-5) and Gemini 3.8 Flash (High Thinking) on Vertex AI (global).
+  version: 1.0.0
+servers:
+  - url: https://your-cloud-run-url.run.app
+    description: Production Google Cloud Run Service
+
+paths:
+  /api/v1/ask:
+    post:
+      summary: Ask a Friend Model
+      operationId: askFriend
+      description: Consult Claude Opus 5.5 (opus-5-5) or Google Gemini 3.8 Flash (High Thinking) for a scoped second opinion, code review, test generation, or security audit.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AskRequest'
+      responses:
+        '200':
+          description: Successful response from friend model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AskResponse'
+        '400':
+          description: Invalid request parameters or security violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Missing or unauthorized authentication credentials
+        '403':
+          description: Invalid or expired authentication token
+        '500':
+          description: Backend inference execution failure
+
+  /api/v1/friends:
+    get:
+      summary: List Available Friend Models
+      operationId: listFriends
+      description: Retrieve list of friend models, specializations, and intelligent auto-routing rules.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Model catalog and routing rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFriendsResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer API Key authentication
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-MCP-API-Key
+      description: Custom header API Key authentication
+
+  schemas:
+    AskRequest:
+      type: object
+      required:
+        - task_type
+        - prompt
+      properties:
+        task_type:
+          type: string
+          enum: [second_opinion, code_review, build_tests, security_audit, spec_critique, finance, taxes, general]
+          default: second_opinion
+          description: Type of task to delegate across any domain (engineering, finance, taxes, strategy, math).
+          example: second_opinion
+        prompt:
+          type: string
+          description: Scoped question, calculation, or review request.
+          example: "Analyze the tax implications and depreciation schedule for Section 179 equipment purchases."
+        context:
+          type: string
+          description: Relevant background text, financial data, or code snippet.
+          example: "Purchase amount: $150,000. Year of purchase: 2026."
+        friend_model:
+          type: string
+          enum: [auto, opus-5-5, claude-opus-5-5, claude-opus-5, sonnet-5, claude-sonnet-5, gemini-3.8-flash, gemini-3.5-flash-lite, gemini-pro, gemini-flash, gemini-flash-lite]
+          default: auto
+          description: Target model. Default 'auto' routes to Claude Opus 5.5 (opus-5-5).
+        max_tokens:
+          type: integer
+          default: 128000
+          description: Max response tokens (up to 128,000 for Claude Opus 5.5).
+
+    AskResponse:
+      type: object
+      required:
+        - status
+        - friend
+        - answer
+      properties:
+        status:
+          type: string
+          example: "ok"
+        friend:
+          type: string
+          example: "opus-5-5"
+        answer:
+          type: string
+          example: "L2: 🔴 bug: Direct equality comparison leaks timing side-channels. Use hmac.compare_digest."
+        cached:
+          type: boolean
+          example: false
+        error:
+          type: string
+          nullable: true
+          example: null
+
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - error
+      properties:
+        status:
+          type: string
+          example: "error"
+        error:
+          type: string
+          example: "Security violation: Malicious instruction override detected."
+
+    FriendModelInfo:
+      type: object
+      required:
+        - alias
+        - description
+      properties:
+        alias:
+          type: string
+          example: "opus-5-5"
+        description:
+          type: string
+          example: "Anthropic Claude Opus 5.5 (opus-5-5) on Model Garden (global)"
+        recommended_for:
+          type: array
+          items:
+            type: string
+          example: ["code_review", "security_audit", "spec_critique"]
+
+    ListFriendsResponse:
+      type: object
+      required:
+        - models
+        - routing_rules
+      properties:
+        models:
+          type: array
+          items:
+            $ref: '#/components/schemas/FriendModelInfo'
+        routing_rules:
+          type: object
+          additionalProperties:
+            type: string

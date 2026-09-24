@@ -1,0 +1,44 @@
+# Ask-a-Friend MCP — Claude Desktop Configuration
+#
+# Add this to your Claude Desktop config at:
+#   macOS: ~/Library/Application Support/Claude/claude_desktop_config.json
+#   Windows: %APPDATA%\Claude\claude_desktop_config.json
+#
+# Option A: Local Execution (stdio)
+# {
+#   "mcpServers": {
+#     "ask-a-friend": {
+#       "command": "uv",
+#       "args": ["run", "python", "-m", "src.server"],
+#       "cwd": "/path/to/ask-a-friend-mcp",
+#       "env": {
+#         "PROJECT_ID": "your-gcp-project-id",
+#         "AUTH_MODE": "none"
+#       }
+#     }
+#   }
+# }
+#
+# Option B: Remote Cloud Run Deployment (mcp-remote / SSE)
+# {
+#   "mcpServers": {
+#     "ask-a-friend": {
+#       "command": "npx",
+#       "args": [
+#         "-y",
+#         "mcp-remote",
+#         "https://your-cloud-run-url.run.app/sse",
+#         "--header",
+#         "Authorization: Bearer YOUR_MCP_API_KEY"
+#       ]
+#     }
+#   }
+# }
+#
+# Available Tools:
+# - ask_a_friend: Ask Claude Opus 5.5 (opus-5-5) or Gemini 3.8 Flash for scoped second opinions, code reviews, security audits, test generation.
+# - list_friends: List all available models, providers, and auto-routing rules.
+#
+# Recommended Usage:
+# 1. For deep code reviews and security audits, delegate to Claude Opus 5.5 (opus-5-5) in global with max output tokens.
+# 2. For fast test generation, delegate to Gemini 3.8 Flash.

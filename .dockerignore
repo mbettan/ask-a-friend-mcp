@@ -1,0 +1,12 @@
+# Exclude GitHub Pages website (docs/) and local dev artifacts from Docker build context
+docs/
+.git/
+.github/
+.venv/
+tests/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.env

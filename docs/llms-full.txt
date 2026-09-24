@@ -1,0 +1,99 @@
+# Ask-a-Friend MCP — Complete System Reference
+
+## Architecture & Target Deployment
+- **Runtime:** Google Cloud Run containerized FastMCP server
+- **Platform:** Google Cloud Platform & Vertex AI Model Garden (`global`)
+- **Anthropic Model Garden:** Anthropic Claude Opus 5.5 (`claude-opus-5-5` / `opus-5-5`) & Sonnet 5 (`claude-sonnet-5` / `sonnet-5`) with Adaptive Thinking (`effort: "high"`), Server-Side Web Search (`web_search_20250305`), Ephemeral Prompt Caching, 1M Token Context (`context-1m-2025-08-07`), and 128K max output tokens
+- **Vertex AI Endpoint:** Google Gemini 3.8 Flash (`gemini-3.8-flash`) with `HIGH` Thinking (`thinking_level="HIGH"`), `googleSearch` grounding, `urlContext`, and 65K max output tokens
+- **Transport Protocols:** Streamable HTTP (`/mcp`), Server-Sent Events (`/sse`), REST (`/api/v1/`)
+- **Authentication:** Bearer / `X-MCP-API-Key`, RFC 7591 OAuth 2.0 Dynamic Client Registration
+
+## Tool Specifications
+
+### 1. `ask_a_friend`
+Delegates a scoped engineering task to a peer AI model.
+- **Parameters:**
+  - `task_type` (string, required): One of `code_review`, `build_tests`, `second_opinion`, `security_audit`, `spec_critique`, `finance`, `taxes`, `general`.
+  - `prompt` (string, required): Scoped question or review request.
+  - `context` (string, optional): Relevant code snippet, diff, or logs pre-trimmed by the calling agent.
+  - `friend_model` (string, default "auto"): Target model alias (`opus-5-5`, `claude-opus-5`, `sonnet-5`, `gemini-3.8-flash`, `gemini-pro`, `gemini-flash`, `gemini-flash-lite` [Gemini 3.5 Flash Lite], `gpt-garden`, `custom_endpoint`).
+  - `max_tokens` (integer, default 128000): Maximum tokens in response.
+- **Output:** Dense, terse markdown text with the friend model's findings and corrections.
+
+### 2. `list_friends`
+Returns all registered model aliases, providers, and auto-routing rules configured via `config/config.json`.
+
+## Prompt Templates
+
+### `peer_code_review`
+Generates a structured prompt formatted with line numbers (`L<line>: 🔴 bug:`, `L<line>: 🟡 warning:`, `L<line>: 🔵 nit:`) and code-exact corrections.
+
+### `security_audit_request`
+Generates a senior application security review prompt categorized by Severity (CRITICAL/HIGH/MED/LOW), CWE ID, Vulnerable lines, and Remediation code.
+
+## Client Integration Reference
+
+> Ask-a-Friend is self-hosted: there is no shared public instance. Deploy your own with
+> `./deploy.sh <YOUR_GCP_PROJECT_ID>`, then replace `your-cloud-run-url.run.app` in every
+> snippet below with the Cloud Run URL that the deploy script prints.
+
+### ChatGPT Native MCP Connector (SSE + OAuth)
+- Server URL: `https://your-cloud-run-url.run.app/sse`
+- Auth: `OAuth` (Auto-negotiated via RFC 7591)
+
+### ChatGPT Custom GPT Action (OpenAPI REST)
+- Import Schema URL: `https://your-cloud-run-url.run.app/openapi.yaml`
+- Authentication: `Bearer <MCP_API_KEY>`
+
+### Claude Desktop (`claude_desktop_config.json`)
+```json
+{
+  "mcpServers": {
+    "ask-a-friend": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://your-cloud-run-url.run.app/sse",
+        "--header",
+        "Authorization: Bearer YOUR_MCP_API_KEY"
+      ]
+    }
+  }
+}
+```
+
+### Cursor IDE (`.cursor/mcp.json`)
+```json
+{
+  "mcpServers": {
+    "ask-a-friend": {
+      "url": "https://your-cloud-run-url.run.app/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_MCP_API_KEY"
+      }
+    }
+  }
+}
+```
+
+### Gemini / Antigravity CLI (`~/.gemini/settings.json` or `.gemini/settings.json`)
+```json
+{
+  "mcpServers": {
+    "ask-a-friend": {
+      "url": "https://your-cloud-run-url.run.app/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_MCP_API_KEY"
+      }
+    }
+  }
+}
+```
+
+## Integration & Documentation URLs
+- GitHub Repository: https://github.com/mbettan/ask-a-friend-mcp
+- Documentation Portal: https://mbettan.github.io/ask-a-friend-mcp/
+- Short Context: https://mbettan.github.io/ask-a-friend-mcp/llms.txt
+- OpenAPI Spec: https://mbettan.github.io/ask-a-friend-mcp/openapi.yaml
+- Issues: https://github.com/mbettan/ask-a-friend-mcp/issues

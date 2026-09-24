@@ -1,0 +1,16 @@
+# Ask-a-Friend MCP — ChatGPT Native MCP & Custom GPT Actions Configuration
+# Use with ChatGPT Native MCP Connector or Custom GPT Actions (GPT Builder)
+#
+# Method 1: ChatGPT Native MCP Connector (SSE + OAuth RFC 7591)
+# - Name: Ask-a-Friend
+# - Server URL: https://your-cloud-run-url.run.app/sse
+# - Authentication: OAuth (Auto-negotiated via RFC 7591)
+#
+# Method 2: Custom GPT Action (OpenAPI 3.1.0 REST)
+# - Import URL: https://your-cloud-run-url.run.app/openapi.yaml
+# - Authentication: API Key -> Bearer -> <YOUR_MCP_API_KEY>
+#
+# Custom GPT Instructions:
+# "When reviewing critical code, performing security audits, or generating comprehensive
+# test suites, use the 'ask_a_friend' action to phone a friend (Anthropic Claude Opus 5.5 [opus-5-5]
+# or Google Gemini 3.8 Flash) for a high-conviction second opinion."

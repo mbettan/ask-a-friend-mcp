@@ -1,0 +1,44 @@
+# Ask-a-Friend MCP
+> Cloud-hosted AI Peer Review via Model Context Protocol (MCP) and REST API. Connects ChatGPT, Claude Desktop, Cursor IDE, Gemini/Antigravity CLI, and Codex to Anthropic Claude Opus 5.5 (`opus-5-5` with max output tokens) and Google Gemini 3.8 Flash (High Thinking) on Google Vertex AI (`global`).
+
+## Overview
+Ask-a-Friend MCP allows any AI agent to delegate code review, security audits, test generation, and architectural critiques to a different model family in a single scoped roundtrip. It features pre-transit PII scrubbing, SHA-256 caching, inbound prompt injection defense, and outbound secret taint tracking.
+
+## Supported Models & Default Capabilities
+- `opus-5-5`: Anthropic Claude Opus 5.5 (`claude-opus-5-5`) on Vertex AI Model Garden (`global`). Enabled by default with Adaptive Thinking (`effort: "high"`), Real-Time Web Search (`web_search_20250305`), Ephemeral Prompt Caching (`cache_control`), 1M Token Context (`context-1m-2025-08-07`), and 128,000 max output tokens.
+- `sonnet-5`: Anthropic Claude Sonnet 5 (`claude-sonnet-5`) on Vertex AI Model Garden (`global`). Enabled by default with Adaptive Thinking (`effort: "high"`), Web Search, Prompt Caching, 1M Context, and 128,000 max output tokens.
+- `gemini-3.8-flash` / `gemini-pro`: Google Gemini 3.8 Flash (`HIGH` Thinking) on Vertex AI (`global`). Enabled by default with `thinking_level="HIGH"`, `googleSearch` grounding, `urlContext`, and 65,536 max output tokens.
+- `gemini-flash`: Google Gemini 3.8 Flash (`HIGH` Thinking) on Vertex AI (`global`).
+- `gemini-flash-lite`: Google Gemini 3.5 Flash Lite (`gemini-3.5-flash-lite`) on Vertex AI (`global`). Low-latency analytical inference.
+- `gpt-garden`: OpenAI GPT-4o on Vertex AI Model Garden.
+
+## Intelligent Auto-Routing (`friend_model="auto"`)
+Configured per use-case via `config/config.json`:
+- `code_review` -> `opus-5-5`
+- `security_audit` -> `opus-5-5`
+- `spec_critique` -> `opus-5-5`
+- `build_tests` -> `opus-5-5`
+- `second_opinion` -> `opus-5-5`
+- Automatic failover -> `gemini-3.8-flash` (`HIGH` Thinking)
+
+## MCP Surface
+- **Tool:** `ask_a_friend(task_type, prompt, context, friend_model="auto", max_tokens=128000)`
+- **Tool:** `list_friends()`
+- **Resource:** `askfriend://config` (Read-only server config with credentials redacted)
+- **Resource:** `askfriend://telemetry/summary` (Uptime, total requests, cache hit rate)
+- **Prompt:** `peer_code_review(code_snippet, language="python", focus="bugs, security, performance")`
+- **Prompt:** `security_audit_request(code_snippet, threat_model="web application")`
+
+## API Endpoints
+- **Streamable HTTP:** `POST /mcp`
+- **SSE Transport:** `GET /sse`
+- **REST API:** `POST /api/v1/ask`
+- **REST Catalog:** `GET /api/v1/friends`
+- **OpenAPI Schema:** `GET /openapi.yaml`
+- **OAuth Discovery:** `GET /.well-known/oauth-authorization-server`
+
+## Integration & Documentation URLs
+- GitHub Repository: https://github.com/mbettan/ask-a-friend-mcp
+- Documentation Portal: https://mbettan.github.io/ask-a-friend-mcp/
+- Full Context: https://mbettan.github.io/ask-a-friend-mcp/llms-full.txt
+- OpenAPI Spec: https://mbettan.github.io/ask-a-friend-mcp/openapi.yaml

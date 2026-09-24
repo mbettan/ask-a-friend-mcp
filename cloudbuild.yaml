@@ -1,0 +1,50 @@
+steps:
+  # 1. Build the container image using Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/ask-friend-repo/${_SERVICE}:$BUILD_ID'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/ask-friend-repo/${_SERVICE}:latest'
+      - '.'
+
+  # 2. Push image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/ask-friend-repo/${_SERVICE}'
+
+  # 3. Deploy to Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE}'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/ask-friend-repo/${_SERVICE}:$BUILD_ID'
+      - '--project=$PROJECT_ID'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--service-account=${_SA}'
+      - '--memory=2Gi'
+      - '--cpu=2'
+      - '--concurrency=80'
+      - '--timeout=300s'
+      - '--min-instances=1'
+      - '--max-instances=2'
+      - '--session-affinity'
+      - '--set-env-vars=GOOGLE_CLOUD_PROJECT=$PROJECT_ID,VERTEX_PROJECT_ID=$PROJECT_ID,VERTEX_LOCATION=global,ANTHROPIC_REGION=global,AUTH_MODE=api_key,ASK_FRIEND_FORCE_MODEL=opus-5-5,LOG_LEVEL=INFO'
+      - '--set-secrets=MCP_API_KEY=mcp-api-key:latest'
+
+substitutions:
+  _REGION: 'us-central1'
+  _SERVICE: 'ask-friend-mcp'
+  _SA: 'ask-friend-runner@${PROJECT_ID}.iam.gserviceaccount.com'
+
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/ask-friend-repo/${_SERVICE}:$BUILD_ID'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/ask-friend-repo/${_SERVICE}:latest'

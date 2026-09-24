@@ -1,0 +1,21 @@
+# Ask-a-Friend MCP — Google Gemini / Antigravity CLI Configuration
+#
+# For use with Antigravity CLI or Google AI SDK MCP client.
+#
+# Local Stdio Connection:
+#   antigravity mcp add ask-a-friend \
+#     --command "uv run python -m src.server" \
+#     --cwd "/path/to/ask-a-friend-mcp" \
+#     --env PROJECT_ID=your-project-id \
+#     --env AUTH_MODE=none
+#
+# Remote Streamable HTTP Connection (Cloud Run):
+#   antigravity mcp add ask-a-friend #     --url "https://your-cloud-run-url.run.app/mcp" #     --header "Authorization: Bearer YOUR_MCP_API_KEY"
+#
+# Available Tools:
+# - ask_a_friend: Delegate scoped questions, audits, reviews, or test generation to a peer model.
+# - list_friends: Enumerate available models (Claude Opus 5.5 [opus-5-5], Gemini 3.8 Flash, Gemini 3.5 Flash Lite, GPT-4o).
+#
+# Golden Rules:
+# 1. Be direct and provide scoped context in prompts.
+# 2. Let auto-routing select the optimal model, or specify friend_model explicitly.

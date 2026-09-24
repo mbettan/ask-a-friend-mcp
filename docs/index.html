@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Ask-a-Friend MCP — Cloud-Hosted AI Peer Review via Claude Opus 5.5 &amp; Gemini</title>
+  
+  <!-- SEO & Search Optimization Metadata -->
+  <meta name="title" content="Ask-a-Friend MCP — Cloud-Hosted AI Peer Review via Claude Opus 5.5 &amp; Gemini 3.8 Flash">
+  <meta name="description" content="Cloud-hosted FastMCP server on Google Cloud Run. Delegate code review, security audits, and second opinions from Claude Web/Desktop/Code, ChatGPT, Cursor IDE, and Gemini CLI to Claude Opus 5.5 (opus-5-5, 128K output, Adaptive High Thinking, Real-Time Web Search, 1M Context) and Gemini 3.8 Flash (High Thinking) on Vertex AI (global).">
+  <meta name="keywords" content="Model Context Protocol, FastMCP, AI Peer Review, Claude Opus 5.5, opus-5-5, Claude Sonnet 5, Google Gemini 3.8 Flash, Adaptive Thinking, Vertex AI Web Search, Prompt Caching, Claude Custom Connector, Claude Code MCP, ChatGPT MCP, Cursor IDE MCP, Cloud Run, Prompt Injection Defense, PII Scrubbing">
+  <meta name="author" content="Ask-a-Friend MCP Contributors">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <link rel="canonical" href="https://mbettan.github.io/ask-a-friend-mcp/">
+
+  <!-- Alternate Formats & LLM Agent Discovery -->
+  <link rel="alternate" type="text/plain" href="llms.txt" title="LLM Agent Summary Documentation">
+  <link rel="alternate" type="text/plain" href="llms-full.txt" title="LLM Full Technical Documentation">
+  <link rel="sitemap" type="application/xml" href="sitemap.xml" title="Sitemap">
+
+  <!-- Favicon & Icons -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Mobile & Browser Theming -->
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0a0c10">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ask-a-Friend MCP">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mbettan.github.io/ask-a-friend-mcp/">
+  <meta property="og:title" content="Ask-a-Friend MCP — Cloud-Hosted AI Peer Review (Claude Opus 5.5 &amp; Gemini 3.8 Flash)">
+  <meta property="og:description" content="Connect Claude Web/Desktop/Code, ChatGPT, Cursor, and Gemini CLI to Claude Opus 5.5 (128K Output, Adaptive High Thinking, Live Web Search, 1M Context) &amp; Gemini 3.8 Flash (High Thinking) via Vertex AI.">
+  <meta property="og:site_name" content="Ask-a-Friend MCP">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://mbettan.github.io/ask-a-friend-mcp/assets/og-image.jpg">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://mbettan.github.io/ask-a-friend-mcp/">
+  <meta name="twitter:title" content="Ask-a-Friend MCP — Cloud-Hosted AI Peer Review (Claude Opus 5.5 &amp; Gemini 3.8 Flash)">
+  <meta name="twitter:description" content="Connect your AI agents to Claude Opus 5.5 (Adaptive High Thinking + Live Web Search) &amp; Gemini 3.8 Flash for scoped code reviews, security audits, and second opinions.">
+  <meta name="twitter:image" content="https://mbettan.github.io/ask-a-friend-mcp/assets/og-image.jpg">
+
+  <!-- Schema.org JSON-LD Structured Data for Google Search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Ask-a-Friend MCP",
+        "url": "https://mbettan.github.io/ask-a-friend-mcp/",
+        "codeRepository": "https://github.com/mbettan/ask-a-friend-mcp",
+        "headline": "Cloud-Hosted AI Peer Review Server for Claude, ChatGPT, Cursor & Gemini",
+        "description": "FastMCP server on Google Cloud Run exposing dual-transport MCP tools and REST endpoints to delegate peer reviews and security audits to Anthropic Claude Opus 5.5 (opus-5-5) and Google Gemini 3.8 Flash (High Thinking).",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Cross-platform",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "Anthropic Claude Opus 5.5 (opus-5-5) & Sonnet 5 (sonnet-5) with Adaptive Thinking (effort=high), Web Search, Ephemeral Caching, 1M Context, and 128K output tokens via Vertex AI Model Garden (global)",
+          "Google Gemini 3.8 Flash (HIGH Thinking) with Google Search and URL Context grounding on Vertex AI (global)",
+          "Dual-transport support: Streamable HTTP (/mcp) and Server-Sent Events (/sse)",
+          "RFC 7591 OAuth 2.0 Dynamic Client Registration for native Claude & ChatGPT MCP integration",
+          "OpenAPI 3.1.0 REST API (/api/v1/) for Custom GPT Actions",
+          "Pre-transit PII scrubbing and post-response rehydration",
+          "Inbound prompt injection guard and outbound secret taint tracking",
+          "SHA-256 prompt response cache to prevent redundant spend"
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "How to Phone a Friend AI Model using Model Context Protocol (MCP)",
+        "description": "Complete guide to connecting local and cloud-hosted AI agents to secondary peer-review models via Google Cloud Run and Vertex AI.",
+        "author": {
+          "@type": "Organization",
+          "name": "Ask-a-Friend MCP Contributors"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Ambient Glow -->
+  <div class="bg-glow-container" aria-hidden="true">
+    <div class="glow-orb glow-1"></div>
+    <div class="glow-orb glow-2"></div>
+    <div class="glow-orb glow-3"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="#" class="nav-brand">
+      <span class="brand-icon">🤝</span>
+      <span>Ask-a-Friend MCP</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#playground" class="nav-link">Playground</a>
+      <a href="#clients" class="nav-link">Client Setup</a>
+      <a href="openapi.yaml" class="nav-link">OpenAPI</a>
+      <a href="llms.txt" class="nav-link">llms.txt</a>
+      <a href="https://github.com/mbettan/ask-a-friend-mcp" class="btn-secondary" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <!-- Hero Section -->
+    <header class="hero">
+      <div class="hero-pill">
+        <span>⚡ Cloud-Hosted on Google Cloud Run &amp; Vertex AI (Global)</span>
+      </div>
+      <h1 class="hero-title">Cloud AI Peer Review<br>For Any Agent</h1>
+      <p class="hero-subtitle">
+        Stuck on a tricky bug or pre-merge security review? Phone a friend. Connect <strong>Claude Web &amp; Code</strong>, <strong>ChatGPT</strong>, <strong>Cursor IDE</strong>, and <strong>Gemini CLI</strong> to <strong>Claude Opus 5.5 (<code>opus-5-5</code>, Adaptive High Thinking + Live Web Search + 128K Output)</strong> and <strong>Gemini 3.8 Flash (<code>HIGH</code> Thinking)</strong> via a high-concurrency FastMCP server.
+      </p>
+      <div class="hero-cta-group">
+        <a href="#playground" class="btn-primary">Try Interactive Demo &rarr;</a>
+        <a href="#clients" class="btn-secondary">1-Click Client Setup</a>
+      </div>
+    </header>
+
+    <!-- Features & Architecture Grid -->
+    <section id="features" class="section">
+      <div class="section-header">
+        <div class="section-tag">Enterprise Architecture</div>
+        <h2 class="section-title">Engineered for High-Assurance Peer Review</h2>
+      </div>
+
+      <div class="grid-3">
+        <article class="card">
+          <div class="card-icon">🧠</div>
+          <h3 class="card-title">Claude Opus 5.5 &amp; Sonnet 5 (128K Out)</h3>
+          <p class="card-desc">Routes deep code reasoning, security audits, and architecture critiques to Anthropic Claude Opus 5.5 (<code>opus-5-5</code>) on Vertex AI (<code>global</code>) with <strong>Adaptive High Thinking</strong>, <strong>1M Token Context</strong>, and <strong>Ephemeral Prompt Caching</strong> enabled by default.</p>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">🌐</div>
+          <h3 class="card-title">Real-Time Web Search &amp; Grounding</h3>
+          <p class="card-desc">Enabled by default with server-side <code>web_search_20250305</code> on Claude and <code>googleSearch</code> + <code>urlContext</code> on <strong>Gemini 3.8 Flash (High Thinking)</strong> to verify live CVEs, SDK releases, and docs.</p>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">🛡️</div>
+          <h3 class="card-title">Security &amp; PII Interceptor</h3>
+          <p class="card-desc">Automatic pre-transit PII scrubbing &amp; rehydration, inbound prompt injection neutralization, and outbound secret taint tracking to prevent credential leaks.</p>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">🔌</div>
+          <h3 class="card-title">Dual-Transport FastMCP &amp; OAuth 2.0</h3>
+          <p class="card-desc">Streamable HTTP on <code>/mcp</code> and SSE on <code>/sse</code> with RFC 7591 OAuth 2.0 Dynamic Client Registration for 1-click connection in Claude Custom Connectors and ChatGPT.</p>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">⚡</div>
+          <h3 class="card-title">Gemini 3.8 Flash High Thinking Failover</h3>
+          <p class="card-desc">Resilient multi-provider fallback ladder automatically fails over to Google Gemini 3.8 Flash (<code>thinking_level="HIGH"</code>, 65K output tokens) on regional quota pressure.</p>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">🗄️</div>
+          <h3 class="card-title">SHA-256 &amp; Ephemeral Caching</h3>
+          <p class="card-desc">Combines deterministic in-memory SHA-256 response caching with Vertex AI ephemeral prompt caching to cut latency by ~80% and cached input token costs by ~90%.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Interactive Simulation Playground -->
+    <section id="playground" class="section">
+      <div class="section-header">
+        <div class="section-tag">Interactive Simulation</div>
+        <h2 class="section-title">Experience the Full MCP Pipeline</h2>
+        <p class="section-subtitle">Watch your request travel through auth, PII scrubbing, caching, model routing, and Vertex AI inference — step by step.</p>
+      </div>
+
+      <div class="playground-box">
+        <div class="playground-header">
+          <div class="terminal-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <span class="playground-title">ask-a-friend-mcp &mdash; pipeline simulator</span>
+          <span id="resolved-model-badge" class="model-badge">opus-5-5</span>
+        </div>
+
+        <!-- 3-Zone Layout: Input | Pipeline | Output -->
+        <div class="playground-layout">
+
+          <!-- Zone 1: Input Panel -->
+          <div class="pg-zone pg-input">
+            <div class="zone-header">
+              <span class="zone-icon">📥</span>
+              <span class="zone-label">MCP Tool Call</span>
+            </div>
+
+            <label for="task-select" class="form-label">task_type</label>
+            <select id="task-select" class="form-select">
+              <option value="code_review">code_review</option>
+              <option value="security_audit">security_audit</option>
+              <option value="build_tests">build_tests</option>
+              <option value="second_opinion">second_opinion</option>
+              <option value="spec_critique">spec_critique</option>
+            </select>
+
+            <label for="prompt-input" class="form-label">prompt</label>
+            <textarea id="prompt-input" class="form-textarea" rows="2" placeholder="Scoped question..."></textarea>
+
+            <label for="context-input" class="form-label">context</label>
+            <textarea id="context-input" class="form-textarea pg-context" rows="4" placeholder="Code snippet..."></textarea>
+
+            <button id="run-sim-btn" class="btn-primary pg-run-btn">
+              <span class="run-icon">▶</span>
+              <span id="run-btn-label">Execute Pipeline</span>
+            </button>
+          </div>
+
+          <!-- Zone 2: Pipeline Visualization -->
+          <div class="pg-zone pg-pipeline">
+            <div class="zone-header">
+              <span class="zone-icon">⚙️</span>
+              <span class="zone-label">Pipeline Stages</span>
+            </div>
+
+            <div class="pipeline-steps">
+              <div class="pipeline-step" data-step="auth">
+                <div class="step-indicator"><span class="step-dot"></span></div>
+                <div class="step-content">
+                  <div class="step-name">🔐 Auth Middleware</div>
+                  <div class="step-detail">Verifying Bearer token…</div>
+                </div>
+                <div class="step-timer"></div>
+              </div>
+              <div class="pipeline-connector"></div>
+
+              <div class="pipeline-step" data-step="injection">
+                <div class="step-indicator"><span class="step-dot"></span></div>
+                <div class="step-content">
+                  <div class="step-name">🛡️ Injection Guard</div>
+                  <div class="step-detail">Scanning for prompt injection…</div>
+                </div>
+                <div class="step-timer"></div>
+              </div>
+              <div class="pipeline-connector"></div>
+
+              <div class="pipeline-step" data-step="pii">
+                <div class="step-indicator"><span class="step-dot"></span></div>
+                <div class="step-content">
+                  <div class="step-name">🧹 PII Scrubber</div>
+                  <div class="step-detail">Redacting secrets &amp; PII…</div>
+                </div>
+                <div class="step-timer"></div>
+              </div>
+              <div class="pipeline-connector"></div>
+
+              <div class="pipeline-step" data-step="cache">
+                <div class="step-indicator"><span class="step-dot"></span></div>
+                <div class="step-content">
+                  <div class="step-name">🗄️ Cache Lookup</div>
+                  <div class="step-detail">SHA-256 cache check…</div>
+                </div>
+                <div class="step-timer"></div>
+              </div>
+              <div class="pipeline-connector"></div>
+
+              <div class="pipeline-step" data-step="route">
+                <div class="step-indicator"><span class="step-dot"></span></div>
+                <div class="step-content">
+                  <div class="step-name">🔀 Auto-Router</div>
+                  <div class="step-detail">Resolving model…</div>
+                </div>
+                <div class="step-timer"></div>
+              </div>
+              <div class="pipeline-connector"></div>
+
+              <div class="pipeline-step step-inference" data-step="inference">
+                <div class="step-indicator"><span class="step-dot"></span></div>
+                <div class="step-content">
+                  <div class="step-name">☁️ Vertex AI Inference</div>
+                  <div class="step-detail">Calling model…</div>
+                </div>
+                <div class="step-timer"></div>
+              </div>
+              <div class="pipeline-connector"></div>
+
+              <div class="pipeline-step" data-step="rehydrate">
+                <div class="step-indicator"><span class="step-dot"></span></div>
+                <div class="step-content">
+                  <div class="step-name">🔄 PII Rehydrate</div>
+                  <div class="step-detail">Restoring redacted tokens…</div>
+                </div>
+                <div class="step-timer"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Zone 3: Output + Stats -->
+          <div class="pg-zone pg-output">
+            <div class="zone-header">
+              <span class="zone-icon">📤</span>
+              <span class="zone-label">Friend's Response</span>
+            </div>
+
+            <div id="output-window" class="output-window">Select a task type and click "Execute Pipeline" to simulate a full MCP round-trip.</div>
+
+            <!-- Stats Bar -->
+            <div id="stats-bar" class="stats-bar">
+              <div class="stat-item">
+                <span class="stat-label">Latency</span>
+                <span id="stat-latency" class="stat-value">—</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Model</span>
+                <span id="stat-model" class="stat-value">—</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Tokens</span>
+                <span id="stat-tokens" class="stat-value">—</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Cache</span>
+                <span id="stat-cache" class="stat-value">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1-Click Client Configurations -->
+    <section id="clients" class="section">
+      <div class="section-header">
+        <div class="section-tag">Universal Compatibility</div>
+        <h2 class="section-title">1-Click Client Setup</h2>
+      </div>
+
+      <div class="tabs-header">
+        <button class="tab-btn active" data-client="claude_connector">Claude Connector &amp; Code CLI</button>
+        <button class="tab-btn" data-client="chatgpt_mcp">ChatGPT MCP Connector</button>
+        <button class="tab-btn" data-client="chatgpt_action">ChatGPT Custom GPT</button>
+        <button class="tab-btn" data-client="claude">Claude Desktop JSON</button>
+        <button class="tab-btn" data-client="cursor">Cursor IDE</button>
+        <button class="tab-btn" data-client="gemini">Gemini / Antigravity CLI</button>
+      </div>
+
+      <div class="code-snippet-box">
+        <button class="copy-btn" data-target="config-code">Copy Config</button>
+        <pre><code id="config-code"># 1. Claude Custom Connector (Claude Web & Desktop UI)
+Settings -> Connectors -> Add custom connector:
+- Name: ask-a-friend
+- MCP server URL: https://your-cloud-run-url.run.app/mcp
+- Authentication: Sign in now (Detected)
+- OAuth client: Register automatically (Detected via RFC 7591)
+- Advanced -> Transport: Streamable HTTP
+
+# 2. Claude Code CLI (claude)
+claude mcp add --scope user --transport http ask-a-friend \
+  https://your-cloud-run-url.run.app/mcp \
+  --header "X-MCP-API-Key: YOUR_MCP_API_KEY"</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div>&copy; 2026 Ask-a-Friend MCP. Built on Google Cloud Run &amp; Vertex AI.</div>
+      <div class="footer-links">
+        <a href="llms.txt" class="footer-link">llms.txt</a>
+        <a href="llms-full.txt" class="footer-link">llms-full.txt</a>
+        <a href="openapi.yaml" class="footer-link">OpenAPI Spec</a>
+        <a href="robots.txt" class="footer-link">robots.txt</a>
+        <a href="sitemap.xml" class="footer-link">sitemap.xml</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Copy Toast Notification -->
+  <div id="toast" class="toast">Copied to clipboard!</div>
+
+  <script src="app.js"></script>
+</body>
+</html>

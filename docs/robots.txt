@@ -1,0 +1,9 @@
+# Robots.txt for Ask-a-Friend MCP GitHub Pages — SEO & AI Crawler Discovery
+User-agent: *
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /openapi.yaml
+Allow: /sitemap.xml
+
+Sitemap: https://mbettan.github.io/ask-a-friend-mcp/sitemap.xml
